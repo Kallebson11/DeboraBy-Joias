@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- CARROSSEL - APARECE APENAS SE NÃO ESTIVER BUSCANDO -->
+    {% if not buscando and not categoria_filtrada %}
+    <div class="container">
+        <div id="carouselJoias" class="carousel slide carousel-custom" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselJoias" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#carouselJoias" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#carouselJoias" data-bs-slide-to="2"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfxG0AZsn6IRX6bGATgES9uXQrxEIf1y77CA&s"
+                        class="d-block w-100" alt="Coleção Verão">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://segredosdomundo.r7.com/wp-content/uploads/2021/01/patos-conheca-as-caracteristicas-dessa-ave-seus-costumes-e-curiosidades.jpg"
+                        class="d-block w-100" alt="Novidades">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Anas_platyrhynchos_male_female_quadrat.jpg/1200px-Anas_platyrhynchos_male_female_quadrat.jpg"
+                        class="d-block w-100" alt="Promoções">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselJoias" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselJoias" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- INDICADOR DE BUSCA -->
+    {% if buscando %}
+    <div class="container mt-4">
+        <div class="alert alert-info d-flex justify-content-between align-items-center">
+            <div>
+                <strong>🔍 Resultados para:</strong> "{{ busca }}"
+                <span class="badge bg-primary ms-2">{{ produtos|length }} produto(s) encontrado(s)</span>
+            </div>
+            <a href="{% url 'index' %}" class="btn btn-sm btn-outline-info">Limpar busca</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- INDICADOR DE CATEGORIA FILTRADA -->
+    {% if categoria_filtrada and not buscando %}
+    <div class="container mt-4">
+        <div class="alert alert-info d-flex justify-content-between align-items-center">
+            <div>
+                <strong>📁 Categoria:</strong> {{ categoria_filtrada.nome }}
+                <span class="badge bg-primary ms-2">{{ produtos|length }} produto(s)</span>
+            </div>
+            <a href="?" class="btn btn-sm btn-outline-info">Limpar filtro</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- SEÇÃO CATEGORIAS COM CARROSSEL HORIZONTAL - APARECE APENAS SE NÃO ESTIVER BUSCANDO -->
+    {% if not buscando %}
+    <section class="categories-section">
+        <div class="container">
+            <!-- TÍTULO COM LINK "TODAS" -->
+            <div class="categories-title-container">
+                <a href="?categoria=todas" class="categories-title-link">
+                    <h2 class="categories-title">
+                        Categorias
+                    </h2>
+                </a>
+            </div>
+            
+            <!-- CARROSSEL HORIZONTAL COM SETAS -->
+            <div class="categories-container">
+                <button class="scroll-btn prev-btn">‹</button>
+                
+                <ul class="category-list">
+                    {% for categoria in categorias %}
+                    <li class="item">
+                        <a href="?categoria={{ categoria.id }}" 
+                           class="category-link {% if categoria_filtrada and categoria_filtrada.id == categoria.id %}active-category{% endif %}">
+                            {% if categoria.imagem %}
+                            <!-- Se a categoria tem imagem -->
+                            <img src="{{ categoria.imagem.url }}" 
+                                 alt="{{ categoria.nome }}" 
+                                 class="category-image">
+                            {% else %}
+                            <!-- Placeholder se não tem imagem -->
+                            <div class="category-image placeholder">
+                                <span class="placeholder-text">{{ categoria.nome|first }}</span>
+                            </div>
+                            {% endif %}
+                            <p class="category-name">{{ categoria.nome }}</p>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <!-- Placeholders se não houver categorias -->
+                    {% for letra in "ABCDEFG" %}
+                    <li class="item">
+                        <a href="#" class="category-link">
+                            <div class="category-image placeholder">
+                                <span class="placeholder-text">{{ letra }}</span>
+                            </div>
+                            <p class="category-name">Categoria {{ letra }}</p>
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+                
+                <button class="scroll-btn next-btn">›</button>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- SEÇÃO PRODUTOS -->
+    <section class="products-section">
+        <div class="container">
+            <!-- TÍTULO DINÂMICO -->
+            <h2 class="products-title">
+                {% if buscando and produtos %}
+                🔍 Resultados para "{{ busca }}"
+                {% elif buscando and not produtos %}
+                🔍 Nenhum resultado
+                {% elif categoria_filtrada %}
+                {{ categoria_filtrada.nome }}
+                {% else %}
+                Productions
+                {% endif %}
+            </h2>
+            
+              <!-- MENSAGEM SE BUSCA NÃO ENCONTRAR NADA -->
+        {% if busca_realizada and not produtos %}
+        <div class="text-center py-5">
+            <div class="empty-results-icon mb-3" style="font-size: 4rem;">🔍</div>
+            <h3>Nenhum produto encontrado</h3>
+            <p class="text-muted mb-4">
+                Não encontramos produtos para "<strong>{{ busca }}</strong>"
+            </p>
+            <div class="suggestions">
+                <p class="text-muted mb-2">Sugestões:</p>
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <a href="?busca=anel" class="btn btn-outline-primary btn-sm">Anel</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="?busca=colar" class="btn btn-outline-primary btn-sm">Colar</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="?busca=pulseira" class="btn btn-outline-primary btn-sm">Pulseira</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="?busca=brinco" class="btn btn-outline-primary btn-sm">Brinco</a>
+                    </li>
+                </ul>
+                <a href="{% url 'index' %}" class="btn btn-primary mt-4">
+                    ← Voltar para todos os produtos
+                </a>
+            </div>
+        </div>
+        {% endif %}
+            
+            <!-- GRID DE PRODUTOS -->
+            <div class="products-grid">
+                {% for produto in produtos %}
+                <div class="product-card">
+                    <!-- IMAGEM DO PRODUTO -->
+                    <div class="product-image-container">
+                        <a href="{% url 'produto_detalhe' produto.id %}">
+                            {% if produto.imagem %}
+                                <img src="{{ produto.imagem.url }}" 
+                                     alt="{{ produto.nome }}" 
+                                     class="product-image">
+                            {% else %}
+                                <!-- Placeholder se não tiver imagem -->
+                                <div class="product-image placeholder">
+                                    <span class="placeholder-icon">💎</span>
+                                </div>
+                            {% endif %}
+                        </a>
+                    </div>
+                    
+                    <!-- NOME DO PRODUTO -->
+                    <div class="product-name">{{ produto.nome }}</div>
+                    
+                    <!-- PREÇO -->
+                    <div class="product-price">R$ {{ produto.preco }}</div>
+                    
+                    <!-- BOTÃO COMPRAR -->
+                    <a href="{% url 'produto_detalhe' produto.id %}" class="btn-comprar">Ver detalhes</a>
+                </div>
+                {% empty %}
+                <!-- Placeholders se não houver produtos -->
+                {% for i in "123456" %}
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <div class="product-image placeholder">
+                            <span class="placeholder-icon">💎</span>
+                        </div>
+                    </div>
+                    <div class="product-name">Produto {{ i }}</div>
+                    <div class="product-price">R$ 99,90</div>
+                    <a href="#" class="btn-comprar">Comprar</a>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- LINKS DE NAVEGAÇÃO -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Início</a></li>
+    </nav>
+
+    <!-- DETALHES DO PRODUTO -->
+    <div class="row">
+        <!-- IMAGEM DO PRODUTO -->
+        <div class="col-md-6">
+            <div class="product-detail-image-container">
+                {% if produto.imagem %}
+                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}"
+                    class="product-detail-image img-fluid rounded">
+                {% else %}
+                <div class="product-detail-image placeholder rounded">
+                    <span class="placeholder-icon-large">💎</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- INFORMAÇÕES DO PRODUTO -->
+        <div class="col-md-6">
+            <div class="product-info">
+                <!-- CATEGORIA -->
+                <span class="badge bg-primary mb-2">{{ produto.categoria.nome }}</span>
+
+                <!-- NOME -->
+                <h1 class="product-detail-name">{{ produto.nome }}</h1>
+
+                <!-- PREÇO -->
+                <div class="product-detail-price">
+                    R$ {{ produto.preco }}
+                </div>
+
+                <!-- DESCRIÇÃO -->
+                <div class="product-description mt-4">
+                    <h5>Descrição</h5>
+                    <p class="text-muted">{{ produto.descricao }}</p>
+                </div>
+
+                <!-- DISPONIBILIDADE -->
+                <div class="availability mt-3">
+                    {% if produto.disponivel %}
+                    <span class="text-success">✅ Disponível em estoque</span>
+                    {% else %}
+                    <span class="text-danger">❌ Indisponível no momento</span>
+                    {% endif %}
+                </div>
+
+                <!-- BOTÕES DE AÇÃO -->
+                <div class="product-actions mt-4">
+                    <button class="btn btn-comprar-detail btn-lg w-100 mb-3">
+                        🛒 Comprar Agora
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg w-100">
+                        💖 Adicionar à Lista de Desejos
+                    </button>
+                </div>
+
+                <div class='col-12 col-md-6'>
+                    {% include 'products/snippets/update_cart.html' with product=produto cart=cart %}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUTOS RELACIONADOS -->
+{% if produtos_relacionados %}
+<div class="related-products mt-5">
+    <h3 class="titulo-secao">Você também pode gostar</h3>
+    <div class="row mt-4">
+        {% for produto_rel in produtos_relacionados %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card product-card-sm h-100">
+                <div class="product-image-container-sm">
+                    {% if produto_rel.imagem %}
+                    <a href="{% url 'produto_detalhe' produto_rel.id %}">
+                        <img src="{{ produto_rel.imagem.url }}" alt="{{ produto_rel.nome }}" class="product-image-sm">
+                    </a>
+                    {% else %}
+                    <a href="{% url 'produto_detalhe' produto_rel.id %}">
+                        <div class="product-image-sm placeholder">
+                            <span class="placeholder-icon">💎</span>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ produto_rel.nome }}</h5>
+                    <p class="card-text text-primary fw-bold">R$ {{ produto_rel.preco }}</p>
+                    <a href="{% url 'produto_detalhe' produto_rel.id %}" class="btn btn-outline-primary mt-auto">Ver
+                        Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn_comprar" name="submit">Registrar</button>
+        <input type="hidden" name="next" value="{% url 'index' %}">
+    </form>
+
+{% endblock content %}
