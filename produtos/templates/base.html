@@ -14,19 +14,19 @@
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer">
 
-
-    <script src="/static/js/script.js"></script>
+    <script src="/static/js/script.js" defer></script>
 
     <!-- Nosso CSS personalizado -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <!-- HEADER COM BARRA DE BUSCA -->
+
+    <!-- HEADER -->
     <header class="header-simple">
         <div class="container">
             <div class="row align-items-center">
-                <!-- LOGO À ESQUERDA -->
+                <!-- LOGO -->
                 <div class="col-md-4">
                     <div class="logo">
                         <h1>BY DÉBORA</h1>
@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <!-- BARRA DE BUSCA NO CENTRO -->
+                <!-- BUSCA -->
                 <div class="col-md-4">
                     <div class="search-container">
                         <form action="{% url 'index' %}" method="GET" class="search-form">
@@ -42,24 +42,24 @@
                                 <input type="text" name="busca" class="form-control search-input"
                                     placeholder="Buscar produtos..." value="{{ busca|default:'' }}"
                                     aria-label="Buscar produtos">
-                                <button class="btn btn-search" type="submit">
-                                    🔍
-                                </button>
+                                <button class="btn btn-search" type="submit">🔍</button>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- MENU DE NAVEGAÇÃO À DIREITA -->
+                <!-- MENU -->
                 <div class="col-md-4">
                     <div class="header-menu text-end">
                         <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm me-2">Início</a>
-                        <a href="{% url 'cart:home' %}" class="btn btn-outline-secondary btn-sm me-2"> {{request.session.cart_items }} <i class="fa-solid fa-cart-arrow-down"></i></a>
+                        <a href="{% url 'cart:home' %}" class="btn btn-outline-secondary btn-sm me-2">
+                            {{ request.session.cart_items }} <i class="fa-solid fa-cart-arrow-down"></i>
+                        </a>
                         {% if user.is_authenticated %}
-                        <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'logout' %}">Sair</a>
+                        <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'users:logout' %}">Sair</a>
                         {% else %}
-                        <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'register' %}">Registrar</a>
-                        <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'login' %}">Entrar</a>
+                        <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'users:register' %}">Registrar</a>
+                        <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'users:login' %}">Entrar</a>
                         {% endif %}
                     </div>
                 </div>
@@ -70,22 +70,83 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-fill">
         {% block content %}
-        <!-- Conteúdo das páginas filhas vai aqui -->
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endblock %}
     </main>
+
+    <!-- FOOTER -->
+    <footer class="footer-main mt-auto">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-grid">
+
+                    <!-- COLUNA 1: Navegação -->
+                    <div class="footer-col">
+                        <h6 class="footer-col-title">Navegação</h6>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'index' %}">Página Inicial</a></li>
+                            <li>
+                                <a href="{% url 'index' %}"
+                                   onclick="event.preventDefault(); document.querySelector('.search-input').focus(); window.scrollTo({top:0, behavior:'smooth'});">
+                                   Busca
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'index' %}"
+                                   onclick="event.preventDefault(); const el = document.querySelector('.categories-section'); if(el) el.scrollIntoView({behavior:'smooth'}); else window.location.href='{% url 'index' %}';">
+                                   Categorias
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- COLUNA 2: Fale com o vendedor -->
+                    <div class="footer-col">
+                        <h6 class="footer-col-title">Fale com o Vendedor</h6>
+                        <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" class="footer-whatsapp">
+                            <i class="fa-brands fa-whatsapp footer-whatsapp-icon"></i>
+                            <span>By Débora Joias</span>
+                        </a>
+                    </div>
+
+                    <!-- COLUNA 3: Formas de pagamento -->
+                    <div class="footer-col">
+                        <h6 class="footer-col-title">Formas de Pagamento</h6>
+                        <div class="footer-payment">
+                            <div class="footer-payment-item">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                                <span>Dinheiro</span>
+                            </div>
+                            <div class="footer-payment-item">
+                                <i class="fa-solid fa-credit-card"></i>
+                                <span>Cartão</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RODAPÉ INFERIOR -->
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; {% now "Y" %} BY DÉBORA JOIAS. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
-<!-- FOOTER SIMPLES -->
-<footer class="footer-simple mt-auto">
-    <div class="container">
-        <p class="mb-0">&copy; 2024 BY DÉBORA JOIAS. Todos os direitos reservados.</p>
-    </div>
-</footer>
-
-<!-- Bootstrap JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-
-
-
-</script>
-
 </html>

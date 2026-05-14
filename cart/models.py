@@ -1,80 +1,120 @@
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import pre_save, post_save, m2m_changed
-
 from produtos.models import Produto
 
-user = settings.AUTH_USER_MODEL
+User = settings.AUTH_USER_MODEL
+
+
+# ============================================================
+# GERENCIADOR DO CARRINHO
+# ============================================================
 
 class CartManager(models.Manager):
+
     def new_or_get(self, request):
         user = request.user
-        cart = None
-        created = False
-
-    
         if user.is_authenticated:
-            cart_qs = self.get_queryset().filter(user=user)
-
-            if cart_qs.exists():
-                cart = cart_qs.first()
-            else:
-                cart = self.create(user=user)
-                created = True
-
-            request.session["cart_id"] = cart.id
+            cart, created = self.get_queryset().get_or_create(user=user)
             return cart, created
+        return Cart(), False
 
-        
-        cart_id = request.session.get("cart_id")
-
-        if cart_id:
-            cart_qs = self.get_queryset().filter(id=cart_id, user__isnull=True)
-            if cart_qs.exists():
-                return cart_qs.first(), False
-
-        cart = self.create()
-        request.session["cart_id"] = cart.id
-        return cart, True
-
-               
+    def get_or_create_for_request(self, request):
+        user = request.user
+        if user.is_authenticated:
+            cart, created = self.get_queryset().get_or_create(user=user)
+            return cart, created
+        return None, False
 
 
+# ============================================================
+# ITEM DO CARRINHO
+# ============================================================
 
+class CartItem(models.Model):
+    cart     = models.ForeignKey('Cart', on_delete=models.CASCADE)
+    product  = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    tamanho  = models.CharField(max_length=20, blank=True, null=True,
+                                verbose_name='Tamanho')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        tam = f' — {self.tamanho}' if self.tamanho else ''
+        return f'{self.quantity} x {self.product.nome}{tam}'
+
+    def get_total_price(self):
+        return self.quantity * self.product.preco
+
+    class Meta:
+        # Permite o mesmo produto com tamanhos diferentes no mesmo carrinho
+        unique_together = ('cart', 'product', 'tamanho')
+
+
+# ============================================================
+# CARRINHO
+# ============================================================
 
 class Cart(models.Model):
-    user = models.ForeignKey(user, on_delete=models.CASCADE, null = True, blank = True)
-    products = models.ManyToManyField(Produto, blank = True)
-    total = models.DecimalField(default = 0.00, max_digits=19, decimal_places = 2)
-    subtotal = models.DecimalField(default=0.00, max_digits=19, decimal_places=2)
-    updated = models.DateTimeField(auto_now = True)
-    timestamp = models.DateTimeField(auto_now_add = True)
-
+    user      = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    items     = models.ManyToManyField(Produto, through='CartItem', blank=True)
+    updated   = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     objects = CartManager()
 
-    def _str_(self):
-        return str(self.id)
-    
+    def __str__(self):
+        if self.user:
+            return f'Carrinho {self.id} — {self.user}'
+        return f'Carrinho {self.id} — Anônimo'
 
-def m2m_changed_cart_receiver(sender, instance, action, *args, **kwargs):
-    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
-        products = instance.products.all()
-        total = 0
-        for product in products:
-            total += product.preco
-            print(total)
-        if instance.subtotal != total:
-            instance.subtotal = total
-            instance.save()
+    @property
+    def subtotal(self):
+        return sum(item.get_total_price() for item in self.cartitem_set.all())
 
+    @property
+    def total(self):
+        return self.subtotal
 
-m2m_changed.connect(m2m_changed_cart_receiver, sender = Cart.products.through)
+    def add_product(self, product, quantity=1, tamanho=None):
+        """Adiciona produto ou incrementa quantidade se já existir."""
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=self,
+            product=product,
+            tamanho=tamanho or None,
+            defaults={'quantity': quantity}
+        )
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
+        return cart_item
 
-def pre_save_cart_receiver(sender, instance, *args, **kwargs):
-    if instance.subtotal > 0:
-        instance.total = instance.subtotal # considere o 10 como uma taxa de entrega
-    else:
-        instance.total = 0.00
+    def remove_product(self, product, quantity=1, tamanho=None):
+        """Remove produto (com tamanho específico) ou decrementa quantidade.
+        Se tamanho não for informado, remove o primeiro item encontrado.
+        """
+        qs = CartItem.objects.filter(cart=self, product=product)
+        if tamanho:
+            qs = qs.filter(tamanho=tamanho)
+        cart_item = qs.first()
+        if not cart_item:
+            return
+        if cart_item.quantity <= quantity:
+            cart_item.delete()
+        else:
+            cart_item.quantity -= quantity
+            cart_item.save()
 
-pre_save.connect(pre_save_cart_receiver, sender = Cart)
+    def get_product_quantity(self, product):
+        try:
+            return CartItem.objects.get(cart=self, product=product).quantity
+        except CartItem.DoesNotExist:
+            return 0
+
+    def get_cart_items(self):
+        if not self.pk:
+            return CartItem.objects.none()
+        return self.cartitem_set.all()
+
+    def clear_cart(self):
+        if self.pk:
+            self.cartitem_set.all().delete()

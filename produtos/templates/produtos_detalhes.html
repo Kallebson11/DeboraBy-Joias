@@ -1,110 +1,176 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
-    <!-- LINKS DE NAVEGAÇÃO -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'index' %}">Início</a></li>
-    </nav>
 
-    <!-- DETALHES DO PRODUTO -->
-    <div class="row">
-        <!-- IMAGEM DO PRODUTO -->
-        <div class="col-md-6">
-            <div class="product-detail-image-container">
+<!-- BREADCRUMB -->
+<div class="container pt-4 pb-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb detail-breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Início</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'index' %}?categoria={{ produto.categoria.id }}">{{ produto.categoria.nome }}</a></li>
+            <li class="breadcrumb-item active">{{ produto.nome }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- DETALHE DO PRODUTO -->
+<div class="container pb-5">
+    <div class="detail-layout">
+
+        <!-- IMAGEM -->
+        <div class="detail-image-col">
+            <div class="detail-image-wrap">
                 {% if produto.imagem %}
-                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}"
-                    class="product-detail-image img-fluid rounded">
+                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="detail-main-image">
                 {% else %}
-                <div class="product-detail-image placeholder rounded">
-                    <span class="placeholder-icon-large">💎</span>
-                </div>
+                <div class="detail-main-image detail-image-placeholder"><span>💎</span></div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- INFORMAÇÕES DO PRODUTO -->
-        <div class="col-md-6">
-            <div class="product-info">
-                <!-- CATEGORIA -->
-                <span class="badge bg-primary mb-2">{{ produto.categoria.nome }}</span>
+        <!-- INFORMAÇÕES -->
+        <div class="detail-info-col">
 
-                <!-- NOME -->
-                <h1 class="product-detail-name">{{ produto.nome }}</h1>
+            <p class="detail-category-label">{{ produto.categoria.nome }}</p>
+            <h1 class="detail-product-name">{{ produto.nome }}</h1>
+            <div class="detail-price">R$ {{ produto.preco }}</div>
 
-                <!-- PREÇO -->
-                <div class="product-detail-price">
-                    R$ {{ produto.preco }}
+            <div class="detail-availability">
+                {% if produto.disponivel %}
+                <span class="detail-available">● Disponível em estoque</span>
+                {% else %}
+                <span class="detail-unavailable">● Indisponível no momento</span>
+                {% endif %}
+            </div>
+
+            <div class="detail-divider"></div>
+
+            <!-- TAMANHO -->
+            {% if produto.tem_tamanhos %}
+            <div class="detail-size-section">
+                <div class="detail-size-header">
+                    <span class="detail-section-label">TAMANHO</span>
+                    <span class="detail-size-selected" id="size-selected">—</span>
                 </div>
-
-                <!-- DESCRIÇÃO -->
-                <div class="product-description mt-4">
-                    <h5>Descrição</h5>
-                    <p class="text-muted">{{ produto.descricao }}</p>
+                <div class="detail-size-options" id="size-options">
+                    {% for tam in produto.tamanhos.all %}
+                    <button class="detail-size-btn" data-size="{{ tam.valor }}">
+                        {{ tam.valor }}
+                    </button>
+                    {% endfor %}
                 </div>
+            </div>
+            <div class="detail-divider"></div>
+            {% endif %}
 
-                <!-- DISPONIBILIDADE -->
-                <div class="availability mt-3">
-                    {% if produto.disponivel %}
-                    <span class="text-success">✅ Disponível em estoque</span>
+            <div class="detail-divider"></div>
+
+            <!-- DESCRIÇÃO (accordion) -->
+            <div class="detail-description">
+                <button class="detail-accordion-btn" id="desc-btn"
+                    onclick="toggleAccordion('desc-body','desc-btn')">
+                    <span>DESCRIÇÃO</span>
+                    <span class="detail-accordion-icon">+</span>
+                </button>
+                <div class="detail-accordion-body" id="desc-body">
+                    <p>{{ produto.descricao }}</p>
+                </div>
+            </div>
+
+            <div class="detail-divider"></div>
+
+            <!-- QUANTIDADE + BOTÃO -->
+            <form method='POST' action='{% url "carts:update" %}'>
+                {% csrf_token %}
+                <input type='hidden' name='product_id' value='{{ produto.id }}' />
+                <input type='hidden' name='action' value='add' />
+                <input type='hidden' name='tamanho' id='tamanho-selecionado' value='' />
+
+                <div class="detail-qty-wrap">
+                    <div class="detail-qty-control">
+                        <button type="button" class="detail-qty-btn btn-quantity-minus">−</button>
+                        <input type="number" name="quantity" value="1" min="1" max="10"
+                            class="detail-qty-input quantity-input" readonly>
+                        <button type="button" class="detail-qty-btn btn-quantity-plus">+</button>
+                    </div>
+
+                    {% if not user.is_authenticated %}
+                    <button type="button" class="detail-add-btn"
+                        data-bs-toggle="modal" data-bs-target="#loginModal">
+                        🔒 Login para Comprar
+                    </button>
                     {% else %}
-                    <span class="text-danger">❌ Indisponível no momento</span>
+                    <button type="submit" class="detail-add-btn">
+                        Adicionar à Sacola
+                    </button>
                     {% endif %}
                 </div>
+            </form>
 
-                <!-- BOTÕES DE AÇÃO -->
-                <div class="product-actions mt-4">
-                    <button class="btn btn-comprar-detail btn-lg w-100 mb-3">
-                        🛒 Comprar Agora
-                    </button>
-                    <button class="btn btn-outline-secondary btn-lg w-100">
-                        💖 Adicionar à Lista de Desejos
-                    </button>
-                </div>
+        </div>
+    </div>
+</div>
 
-                <div class='col-12 col-md-6'>
-                    {% include 'products/snippets/update_cart.html' with product=produto cart=cart %}
-                </div>
-
-
+<!-- MODAL LOGIN -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">🔐 Login Necessário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você não está logado. Deseja fazer login para adicionar este produto ao carrinho?</p>
+                <p class="text-muted small">Produto: <strong>{{ produto.nome }}</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não, continuar observando</button>
+                <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary">Sim, fazer login</a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- PRODUTOS RELACIONADOS -->
+<!-- COMPLETE O LOOK -->
 {% if produtos_relacionados %}
-<div class="related-products mt-5">
-    <h3 class="titulo-secao">Você também pode gostar</h3>
-    <div class="row mt-4">
-        {% for produto_rel in produtos_relacionados %}
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card product-card-sm h-100">
-                <div class="product-image-container-sm">
-                    {% if produto_rel.imagem %}
-                    <a href="{% url 'produto_detalhe' produto_rel.id %}">
-                        <img src="{{ produto_rel.imagem.url }}" alt="{{ produto_rel.nome }}" class="product-image-sm">
-                    </a>
-                    {% else %}
-                    <a href="{% url 'produto_detalhe' produto_rel.id %}">
-                        <div class="product-image-sm placeholder">
-                            <span class="placeholder-icon">💎</span>
-                        </div>
-                    </a>
-                    {% endif %}
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ produto_rel.nome }}</h5>
-                    <p class="card-text text-primary fw-bold">R$ {{ produto_rel.preco }}</p>
-                    <a href="{% url 'produto_detalhe' produto_rel.id %}" class="btn btn-outline-primary mt-auto">Ver
-                        Detalhes</a>
-                </div>
-            </div>
+<section class="complete-look-section">
+    <div class="container">
+        <div class="complete-look-header">
+            <h2 class="complete-look-title">Complete o Look</h2>
         </div>
-        {% endfor %}
+        <div class="complete-look-divider"></div>
+
+        <div class="complete-look-carousel-wrap">
+            <button class="look-scroll-btn look-prev-btn">‹</button>
+
+            <div class="complete-look-list" id="completeLookList">
+                {% for produto_rel in produtos_relacionados %}
+                <div class="look-card">
+                    <a href="{% url 'produto_detalhe' produto_rel.id %}" class="look-card-image-link">
+                        {% if produto_rel.imagem %}
+                        <img src="{{ produto_rel.imagem.url }}" alt="{{ produto_rel.nome }}" class="look-card-image">
+                        {% else %}
+                        <div class="look-card-image look-card-placeholder">💎</div>
+                        {% endif %}
+                    </a>
+                    <div class="look-card-body">
+                        <a href="{% url 'produto_detalhe' produto_rel.id %}" class="look-card-name">
+                            {{ produto_rel.nome }}
+                        </a>
+                        <p class="look-card-price">R$ {{ produto_rel.preco }}</p>
+                        <a href="{% url 'produto_detalhe' produto_rel.id %}" class="look-card-btn">
+                            Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button class="look-scroll-btn look-next-btn">›</button>
+        </div>
     </div>
-</div>
+</section>
 {% endif %}
-</div>
+
+
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <!-- CARROSSEL - APARECE APENAS SE NÃO ESTIVER BUSCANDO -->
+
+    <!-- CARROSSEL -->
     {% if not buscando and not categoria_filtrada %}
     <div class="container">
         <div id="carouselJoias" class="carousel slide carousel-custom" data-bs-ride="carousel">
@@ -34,61 +35,25 @@
     </div>
     {% endif %}
 
-    <!-- INDICADOR DE BUSCA -->
-    {% if buscando %}
-    <div class="container mt-4">
-        <div class="alert alert-info d-flex justify-content-between align-items-center">
-            <div>
-                <strong>🔍 Resultados para:</strong> "{{ busca }}"
-                <span class="badge bg-primary ms-2">{{ produtos|length }} produto(s) encontrado(s)</span>
-            </div>
-            <a href="{% url 'index' %}" class="btn btn-sm btn-outline-info">Limpar busca</a>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- INDICADOR DE CATEGORIA FILTRADA -->
-    {% if categoria_filtrada and not buscando %}
-    <div class="container mt-4">
-        <div class="alert alert-info d-flex justify-content-between align-items-center">
-            <div>
-                <strong>📁 Categoria:</strong> {{ categoria_filtrada.nome }}
-                <span class="badge bg-primary ms-2">{{ produtos|length }} produto(s)</span>
-            </div>
-            <a href="?" class="btn btn-sm btn-outline-info">Limpar filtro</a>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- SEÇÃO CATEGORIAS COM CARROSSEL HORIZONTAL - APARECE APENAS SE NÃO ESTIVER BUSCANDO -->
+    <!-- CATEGORIAS -->
     {% if not buscando %}
     <section class="categories-section">
         <div class="container">
-            <!-- TÍTULO COM LINK "TODAS" -->
             <div class="categories-title-container">
                 <a href="?categoria=todas" class="categories-title-link">
-                    <h2 class="categories-title">
-                        Categorias
-                    </h2>
+                    <h2 class="categories-title">Categorias</h2>
                 </a>
             </div>
-            
-            <!-- CARROSSEL HORIZONTAL COM SETAS -->
             <div class="categories-container">
                 <button class="scroll-btn prev-btn">‹</button>
-                
                 <ul class="category-list">
                     {% for categoria in categorias %}
                     <li class="item">
-                        <a href="?categoria={{ categoria.id }}" 
+                        <a href="?categoria={{ categoria.id }}"
                            class="category-link {% if categoria_filtrada and categoria_filtrada.id == categoria.id %}active-category{% endif %}">
                             {% if categoria.imagem %}
-                            <!-- Se a categoria tem imagem -->
-                            <img src="{{ categoria.imagem.url }}" 
-                                 alt="{{ categoria.nome }}" 
-                                 class="category-image">
+                            <img src="{{ categoria.imagem.url }}" alt="{{ categoria.nome }}" class="category-image">
                             {% else %}
-                            <!-- Placeholder se não tem imagem -->
                             <div class="category-image placeholder">
                                 <span class="placeholder-text">{{ categoria.nome|first }}</span>
                             </div>
@@ -97,7 +62,6 @@
                         </a>
                     </li>
                     {% empty %}
-                    <!-- Placeholders se não houver categorias -->
                     {% for letra in "ABCDEFG" %}
                     <li class="item">
                         <a href="#" class="category-link">
@@ -110,91 +74,90 @@
                     {% endfor %}
                     {% endfor %}
                 </ul>
-                
                 <button class="scroll-btn next-btn">›</button>
             </div>
         </div>
     </section>
     {% endif %}
 
-    <!-- SEÇÃO PRODUTOS -->
-    <section class="products-section">
-        <div class="container">
-            <!-- TÍTULO DINÂMICO -->
-            <h2 class="products-title">
-                {% if buscando and produtos %}
-                🔍 Resultados para "{{ busca }}"
-                {% elif buscando and not produtos %}
-                🔍 Nenhum resultado
-                {% elif categoria_filtrada %}
-                {{ categoria_filtrada.nome }}
-                {% else %}
-                Productions
-                {% endif %}
-            </h2>
-            
-              <!-- MENSAGEM SE BUSCA NÃO ENCONTRAR NADA -->
+    <!-- ===== LAYOUT DE BUSCA / CATEGORIA (estilo Nike) ===== -->
+    {% if buscando or categoria_filtrada %}
+
         {% if busca_realizada and not produtos %}
-        <div class="text-center py-5">
-            <div class="empty-results-icon mb-3" style="font-size: 4rem;">🔍</div>
-            <h3>Nenhum produto encontrado</h3>
-            <p class="text-muted mb-4">
-                Não encontramos produtos para "<strong>{{ busca }}</strong>"
-            </p>
-            <div class="suggestions">
-                <p class="text-muted mb-2">Sugestões:</p>
-                <ul class="list-inline">
-                    <li class="list-inline-item">
-                        <a href="?busca=anel" class="btn btn-outline-primary btn-sm">Anel</a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="?busca=colar" class="btn btn-outline-primary btn-sm">Colar</a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="?busca=pulseira" class="btn btn-outline-primary btn-sm">Pulseira</a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="?busca=brinco" class="btn btn-outline-primary btn-sm">Brinco</a>
-                    </li>
-                </ul>
-                <a href="{% url 'index' %}" class="btn btn-primary mt-4">
-                    ← Voltar para todos os produtos
-                </a>
-            </div>
+        <!-- BUSCA SEM RESULTADO -->
+        <div class="search-empty-page">
+            <p class="search-empty-title">Sua busca não retornou produtos.</p>
+            <p class="search-empty-sub">Simplifique sua pesquisa para ver outros resultados.</p>
+            <a href="{% url 'index' %}" class="btn-cart-continue" style="margin-top: 28px; display: inline-block;">
+                Voltar para todos os produtos
+            </a>
         </div>
-        {% endif %}
-            
-            <!-- GRID DE PRODUTOS -->
-            <div class="products-grid">
+
+        {% else %}
+        <!-- BUSCA / CATEGORIA COM RESULTADO — layout duas colunas -->
+        <div class="search-results-layout">
+
+            <!-- COLUNA ESQUERDA: título e contagem -->
+            <aside class="search-sidebar">
+                <h2 class="search-sidebar-title">
+                    {% if buscando %}
+                        {{ busca }}
+                    {% else %}
+                        {{ categoria_filtrada.nome }}
+                    {% endif %}
+                </h2>
+                <span class="search-sidebar-count">({{ produtos|length }})</span>
+            </aside>
+
+            <!-- COLUNA DIREITA: grid de produtos 4 colunas -->
+            <div class="search-results-grid">
                 {% for produto in produtos %}
                 <div class="product-card">
-                    <!-- IMAGEM DO PRODUTO -->
                     <div class="product-image-container">
                         <a href="{% url 'produto_detalhe' produto.id %}">
                             {% if produto.imagem %}
-                                <img src="{{ produto.imagem.url }}" 
-                                     alt="{{ produto.nome }}" 
-                                     class="product-image">
+                            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="product-image">
                             {% else %}
-                                <!-- Placeholder se não tiver imagem -->
-                                <div class="product-image placeholder">
-                                    <span class="placeholder-icon">💎</span>
-                                </div>
+                            <div class="product-image placeholder">
+                                <span class="placeholder-icon">💎</span>
+                            </div>
                             {% endif %}
                         </a>
                     </div>
-                    
-                    <!-- NOME DO PRODUTO -->
                     <div class="product-name">{{ produto.nome }}</div>
-                    
-                    <!-- PREÇO -->
                     <div class="product-price">R$ {{ produto.preco }}</div>
-                    
-                    <!-- BOTÃO COMPRAR -->
+                    <a href="{% url 'produto_detalhe' produto.id %}" class="btn-comprar">Ver detalhes</a>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endif %}
+
+    {% else %}
+    <!-- ===== PÁGINA NORMAL: todos os produtos ===== -->
+    <section class="products-section">
+        <div class="container">
+            <h2 class="products-title">Productions</h2>
+            <div class="products-grid">
+                {% for produto in produtos %}
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <a href="{% url 'produto_detalhe' produto.id %}">
+                            {% if produto.imagem %}
+                            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="product-image">
+                            {% else %}
+                            <div class="product-image placeholder">
+                                <span class="placeholder-icon">💎</span>
+                            </div>
+                            {% endif %}
+                        </a>
+                    </div>
+                    <div class="product-name">{{ produto.nome }}</div>
+                    <div class="product-price">R$ {{ produto.preco }}</div>
                     <a href="{% url 'produto_detalhe' produto.id %}" class="btn-comprar">Ver detalhes</a>
                 </div>
                 {% empty %}
-                <!-- Placeholders se não houver produtos -->
                 {% for i in "123456" %}
                 <div class="product-card">
                     <div class="product-image-container">
@@ -211,4 +174,6 @@
             </div>
         </div>
     </section>
+    {% endif %}
+
 {% endblock %}

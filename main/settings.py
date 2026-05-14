@@ -16,12 +16,18 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from decouple import config
+ 
+WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default='5500000000000')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-df*7k+k)&#nfm3i*ty4h2lqxq5_*1@v81q*y)6h#$c$81$5vh4'
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -67,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.whatsapp',
             ],
         },
     },
@@ -106,16 +113,33 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        # Mínimo de 8 caracteres (ajuste min_length se quiser)
+        'NAME': 'users.validators.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        # Impede senha só com números (ex: "12345678")
+        'NAME': 'users.validators.NoNumericOnlyValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        # Exige pelo menos uma letra maiúscula
+        'NAME': 'users.validators.UppercaseValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        # Exige pelo menos uma letra minúscula
+        'NAME': 'users.validators.LowercaseValidator',
+    },
+    {
+        # Exige pelo menos um caractere especial
+        'NAME': 'users.validators.SpecialCharValidator',
+    },
+    {
+        # Impede espaços na senha
+        'NAME': 'users.validators.NoSpacesValidator',
+    },
+    {
+        # Impede senha igual ou contendo o nome de usuário
+        'NAME': 'users.validators.NoUsernameSimilarityValidator',
     },
 ]
 

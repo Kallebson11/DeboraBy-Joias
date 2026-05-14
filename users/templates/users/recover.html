@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Conta — BY DÉBORA JOIAS</title>
+    <title>Redefinir Senha — BY DÉBORA JOIAS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -23,35 +23,28 @@
         </div>
 
         <div class="auth-card">
-            <p class="auth-title">Criar Conta</p>
-
-            <p class="auth-has-account">
-                Já tem uma conta? <a href="{% url 'users:login' %}">Entrar</a>
-            </p>
+            <p class="auth-title">Redefinir Senha</p>
+            <p class="auth-subtitle">Informe seu usuário e escolha uma nova senha</p>
 
             <!-- Mensagem de erro inline (requisitos não cumpridos) -->
             <div id="inline-error" class="alert-auth" style="display:none;">
                 Senha não atualizada, verifique os requisitos e tente novamente.
             </div>
 
-            <form id="register-form" action="{% url 'users:register' %}" method="post">
-                {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert-auth">
+                {% for error in form.non_field_errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-                <!-- Nome e Sobrenome (visual por enquanto) -->
-                <div class="auth-row">
-                    <div class="auth-field">
-                        <label for="first_name">Nome *</label>
-                        <input type="text" id="first_name" name="first_name">
-                    </div>
-                    <div class="auth-field">
-                        <label for="last_name">Sobrenome *</label>
-                        <input type="text" id="last_name" name="last_name">
-                    </div>
-                </div>
+            <form id="recover-form" action="{% url 'users:recover' %}" method="post">
+                {% csrf_token %}
 
                 <!-- Usuário -->
                 <div class="auth-field">
-                    <label for="{{ form.username.id_for_label }}">Usuário *</label>
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
                     {{ form.username }}
                     {% if form.username.errors %}
                         {% for error in form.username.errors %}
@@ -60,12 +53,12 @@
                     {% endif %}
                 </div>
 
-                <!-- Senha -->
+                <!-- Nova Senha -->
                 <div class="auth-field">
-                    <label for="{{ form.password1.id_for_label }}">Senha *</label>
-                    {{ form.password1 }}
-                    {% if form.password1.errors %}
-                        {% for error in form.password1.errors %}
+                    <label for="{{ form.new_password.id_for_label }}">{{ form.new_password.label }}</label>
+                    {{ form.new_password }}
+                    {% if form.new_password.errors %}
+                        {% for error in form.new_password.errors %}
                             <span class="auth-field-error">{{ error }}</span>
                         {% endfor %}
                     {% endif %}
@@ -93,12 +86,12 @@
                     </div>
                 </div>
 
-                <!-- Confirmação de senha -->
+                <!-- Confirmar Senha -->
                 <div class="auth-field" style="margin-top: 14px;">
-                    <label for="{{ form.password2.id_for_label }}">Confirmação de Senha *</label>
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        {% for error in form.password2.errors %}
+                    <label for="{{ form.confirm_password.id_for_label }}">{{ form.confirm_password.label }}</label>
+                    {{ form.confirm_password }}
+                    {% if form.confirm_password.errors %}
+                        {% for error in form.confirm_password.errors %}
                             <span class="auth-field-error">{{ error }}</span>
                         {% endfor %}
                     {% endif %}
@@ -106,15 +99,17 @@
 
                 <div id="confirm-feedback" class="confirm-msg"></div>
 
-                <p class="auth-required-note">* Campos obrigatórios</p>
-
-                <button type="submit" class="btn-auth" name="submit">Criar Conta</button>
+                <button type="submit" class="btn-auth" style="margin-top: 20px;">Redefinir Senha</button>
                 <input type="hidden" name="next" value="{% url 'index' %}">
             </form>
 
+            <div class="auth-footer">
+                <a href="{% url 'users:login' %}">Voltar para o login</a>
+            </div>
         </div>
+
     </div>
 
-{% endblock content %}
+{% endblock %}
 </body>
 </html>

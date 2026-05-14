@@ -1,13 +1,47 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — BY DÉBORA JOIAS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/script.js" defer></script>
+</head>
 
+<body class="auth-page">
 {% block content %}
+    <div class="auth-wrapper">
 
-    <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        <div class="auth-logo">
+            <span class="brand-name">By Débora Joias</span>
+            <span class="brand-sub">Sua joia, sua história</span>
+            <div class="logo-divider"></div>
+        </div>
 
-        <button class="btn_comprar" name="submit">Entrar</button>
-        <input type="hidden" name="next" value="{% url 'index' %}">
-    </form>
+        <div class="auth-card">
+            <p class="auth-title">Acessar minha Conta</p>
 
-{% endblock content %}
+            <form action="{% url 'users:login' %}" method="post" class="django-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <div class="auth-forgot">
+                    <a href="{% url 'users:recover' %}">Esqueceu a sua senha?</a>
+                </div>
+
+                <button type="submit" class="btn-auth" name="submit">Entrar</button>
+                <input type="hidden" name="next" value="{% url 'index' %}">
+            </form>
+
+            <div class="auth-footer">
+                Não tem uma conta? <a href="{% url 'users:register' %}">Cadastrar</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+</body>
+</html>
