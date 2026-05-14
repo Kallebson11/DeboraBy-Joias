@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-df*7k+k)&#nfm3i*ty4h2lqxq5_*1@v81q*y)6h#$c$81$5vh4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -93,17 +93,9 @@ WSGI_APPLICATION = 'main.wsgi.application'
 }"""
 
 DATABASES = {
-    'default' :{
-        'ENGINE': 'mssql',
-        'NAME': 'DeboraByJoias',
-        'USER': 'sa',
-        'PASSWORD': '251525',
-        'HOST': 'DSNB285',
-        'PORT': 50844,
-        'OPTIONS':{
-            'driver':'ODBC Driver 17 for SQL Server',
-            'Trusted_connection':'yes'
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
