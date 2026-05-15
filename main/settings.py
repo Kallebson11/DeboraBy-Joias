@@ -17,7 +17,7 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default="123456")
+WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default="38999272628")
 
 
 # Quick-start development settings - unsuitable for production
