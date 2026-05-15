@@ -12,12 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+#from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default='5500000000000')
+#WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default='5500000000000')
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-df*7k+k)&#nfm3i*ty4h2lqxq5_*1@v81q*y)6h#$c$81$5vh4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["deboraby-joias.onrender.com"]
 
 
 # Application definition
