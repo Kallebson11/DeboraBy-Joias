@@ -1,3 +1,2 @@
 *.env
-dados.json
-*.sqlite3
+Libs/
