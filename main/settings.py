@@ -26,13 +26,14 @@ WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default="38999272628")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-df*7k+k)&#nfm3i*ty4h2lqxq5_*1@v81q*y)6h#$c$81$5vh4'
 
-
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["deboraby-joias.onrender.com", "localhost"]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://deboraby-joias.onrender.com',
+]
 
 # Application definition
 
