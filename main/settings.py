@@ -12,12 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-from decouple import config
- 
 WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default='5500000000000')
 
 
