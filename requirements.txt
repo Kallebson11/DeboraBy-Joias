@@ -1,5 +1,4 @@
 asgiref==3.10.0
-decouple==0.0.7
 Django==5.2.7
 django-bootstrap5==25.2
 gunicorn==26.0.0
