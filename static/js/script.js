@@ -50,12 +50,34 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.detail-size-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             const val = this.dataset.size;
-            const label = document.getElementById('size-selected');
+            const label  = document.getElementById('size-selected');
             const hidden = document.getElementById('tamanho-selecionado');
+            const err    = document.getElementById('size-error');
             if (label)  label.textContent = val;
             if (hidden) hidden.value = val;
+            if (err)    err.style.display = 'none'; // esconde erro ao selecionar
         });
     });
+
+    // ============================================================
+    // VALIDAÇÃO DE TAMANHO — FORM DE ADICIONAR AO CARRINHO
+    // ============================================================
+    const addCartForm = document.querySelector('form[data-require-size]');
+    if (addCartForm) {
+        addCartForm.addEventListener('submit', function (e) {
+            const requireSize = this.dataset.requireSize === 'true';
+            const tamanhoInput = document.getElementById('tamanho-selecionado');
+            const sizeError    = document.getElementById('size-error');
+
+            if (requireSize && tamanhoInput && !tamanhoInput.value.trim()) {
+                e.preventDefault();
+                if (sizeError) sizeError.style.display = 'block';
+                // Rola suavemente até a seção de tamanhos
+                const sizeSection = document.querySelector('.detail-size-section');
+                if (sizeSection) sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
 
     // ============================================================
     // VALIDAÇÃO DE SENHA — REGISTRO

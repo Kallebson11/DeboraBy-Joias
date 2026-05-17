@@ -41,9 +41,15 @@ class CartUpdateView(View):
             return redirect('carts:home')
 
         if action == 'add':
+            # Validação backend: produto tem tamanhos mas nenhum foi selecionado
+            if product.tem_tamanhos() and not tamanho:
+                messages.error(request, 'Selecione um tamanho antes de adicionar ao carrinho.')
+                referer = request.META.get('HTTP_REFERER', '')
+                return redirect(referer or 'carts:home')
+
             cart_obj.add_product(product, quantity, tamanho=tamanho)
+
         elif action == 'delete':
-            # O tamanho vem do form de remoção no carrinho
             cart_obj.remove_product(product, 999, tamanho=tamanho)
 
         referer = request.META.get('HTTP_REFERER', '')
@@ -86,7 +92,6 @@ class CartWhatsAppView(LoginRequiredMixin, View):
             subtotal = float(item.get_total_price())
             total   += subtotal
 
-            # Linha do produto com tamanho (se houver)
             tam_info = f' — Tamanho: {item.tamanho}' if item.tamanho else ''
             linhas.append(f"• {item.quantity}x {item.product.nome}{tam_info}")
             linhas.append(f"  R$ {preco:.2f} cada = R$ {subtotal:.2f}")

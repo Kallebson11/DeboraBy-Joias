@@ -90,11 +90,16 @@ class Cart(models.Model):
 
     def remove_product(self, product, quantity=1, tamanho=None):
         """Remove produto (com tamanho específico) ou decrementa quantidade.
-        Se tamanho não for informado, remove o primeiro item encontrado.
+        Trata tamanho vazio e None como equivalentes.
         """
+        # Normaliza: string vazia vira None
+        tamanho = tamanho.strip() if tamanho else None
         qs = CartItem.objects.filter(cart=self, product=product)
         if tamanho:
             qs = qs.filter(tamanho=tamanho)
+        else:
+            # Remove itens sem tamanho (None ou vazio)
+            qs = qs.filter(tamanho__isnull=True) | qs.filter(tamanho='')
         cart_item = qs.first()
         if not cart_item:
             return

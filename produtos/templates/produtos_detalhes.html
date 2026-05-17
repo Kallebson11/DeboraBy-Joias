@@ -80,9 +80,15 @@
             <div class="detail-divider"></div>
 
             <!-- QUANTIDADE + BOTÃO -->
-            <form method='POST' action='{% url "carts:update" %}'>
+            <form method='POST' action='{% url "carts:update" %}'
+                  data-require-size="{% if produto.tem_tamanhos %}true{% else %}false{% endif %}">
                 {% csrf_token %}
                 <input type='hidden' name='product_id' value='{{ produto.id }}' />
+                <div id="size-error" style="display:none; color:#e74c3c; font-size:0.8rem;
+                     padding:6px 10px; background:#fef5f5; border-left:2px solid #e74c3c;
+                     border-radius:3px; margin-bottom:10px;">
+                    Selecione um tamanho antes de adicionar ao carrinho.
+                </div>
                 <input type='hidden' name='action' value='add' />
                 <input type='hidden' name='tamanho' id='tamanho-selecionado' value='' />
 
