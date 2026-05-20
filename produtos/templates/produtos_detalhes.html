@@ -47,7 +47,7 @@
 
             <!-- TAMANHO -->
             {% if produto.tem_tamanhos %}
-            <div class="detail-size-section">
+            <div class="detail-size-section" id="size-section">
                 <div class="detail-size-header">
                     <span class="detail-section-label">TAMANHO</span>
                     <span class="detail-size-selected" id="size-selected">—</span>
@@ -59,6 +59,9 @@
                     </button>
                     {% endfor %}
                 </div>
+                <p id="size-error-msg" style="display:none; color:#e74c3c; font-size:0.8rem; margin-top:8px; margin-bottom:0;">
+                    Favor, escolha um tamanho.
+                </p>
             </div>
             <div class="detail-divider"></div>
             {% endif %}
@@ -84,11 +87,7 @@
                   data-require-size="{% if produto.tem_tamanhos %}true{% else %}false{% endif %}">
                 {% csrf_token %}
                 <input type='hidden' name='product_id' value='{{ produto.id }}' />
-                <div id="size-error" style="display:none; color:#e74c3c; font-size:0.8rem;
-                     padding:6px 10px; background:#fef5f5; border-left:2px solid #e74c3c;
-                     border-radius:3px; margin-bottom:10px;">
-                    Selecione um tamanho antes de adicionar ao carrinho.
-                </div>
+
                 <input type='hidden' name='action' value='add' />
                 <input type='hidden' name='tamanho' id='tamanho-selecionado' value='' />
 
@@ -100,7 +99,11 @@
                         <button type="button" class="detail-qty-btn btn-quantity-plus">+</button>
                     </div>
 
-                    {% if not user.is_authenticated %}
+                    {% if not produto.disponivel %}
+                    <a href="{% url 'index' %}" class="detail-add-btn detail-add-btn--unavailable">
+                        Olhar outras opções
+                    </a>
+                    {% elif not user.is_authenticated %}
                     <button type="button" class="detail-add-btn"
                         data-bs-toggle="modal" data-bs-target="#loginModal">
                         🔒 Login para Comprar

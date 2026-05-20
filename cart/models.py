@@ -94,13 +94,20 @@ class Cart(models.Model):
         """
         # Normaliza: string vazia vira None
         tamanho = tamanho.strip() if tamanho else None
-        qs = CartItem.objects.filter(cart=self, product=product)
+
         if tamanho:
-            qs = qs.filter(tamanho=tamanho)
+            cart_item = CartItem.objects.filter(
+                cart=self, product=product, tamanho=tamanho
+            ).first()
         else:
-            # Remove itens sem tamanho (None ou vazio)
-            qs = qs.filter(tamanho__isnull=True) | qs.filter(tamanho='')
-        cart_item = qs.first()
+            # Busca sem tamanho: tenta NULL primeiro, depois string vazia
+            cart_item = CartItem.objects.filter(
+                cart=self, product=product, tamanho__isnull=True
+            ).first()
+            if not cart_item:
+                cart_item = CartItem.objects.filter(
+                    cart=self, product=product, tamanho=''
+                ).first()
         if not cart_item:
             return
         if cart_item.quantity <= quantity:

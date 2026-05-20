@@ -706,3 +706,19 @@ body.auth-page { background: var(--cream); font-family: var(--font-body); min-he
     .products-grid { grid-template-columns: 1fr; }
     .search-results-grid { grid-template-columns: 1fr; }
 }
+
+/* Botão "Olhar outras opções" — produto indisponível */
+.detail-add-btn--unavailable {
+    background: var(--ink-muted);
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.detail-add-btn--unavailable:hover {
+    background: var(--ink-light);
+    color: var(--white);
+    transform: translateY(-1px);
+}

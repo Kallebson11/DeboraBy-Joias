@@ -65,15 +65,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const addCartForm = document.querySelector('form[data-require-size]');
     if (addCartForm) {
         addCartForm.addEventListener('submit', function (e) {
-            const requireSize = this.dataset.requireSize === 'true';
+            const requireSize  = this.dataset.requireSize === 'true';
             const tamanhoInput = document.getElementById('tamanho-selecionado');
-            const sizeError    = document.getElementById('size-error');
 
             if (requireSize && tamanhoInput && !tamanhoInput.value.trim()) {
                 e.preventDefault();
-                if (sizeError) sizeError.style.display = 'block';
-                // Rola suavemente até a seção de tamanhos
-                const sizeSection = document.querySelector('.detail-size-section');
+
+                // Mensagem em vermelho abaixo de Tamanho
+                const errMsg = document.getElementById('size-error-msg');
+                if (errMsg) errMsg.style.display = 'block';
+
+                // Borda vermelha nos botões de tamanho
+                document.querySelectorAll('.detail-size-btn').forEach(b => {
+                    b.style.borderColor = '#e74c3c';
+                });
+
+                // Remove após 3 segundos
+                setTimeout(() => {
+                    if (errMsg) errMsg.style.display = 'none';
+                    document.querySelectorAll('.detail-size-btn').forEach(b => {
+                        b.style.borderColor = '';
+                    });
+                }, 3000);
+
+                // Rola até a seção de tamanhos
+                const sizeSection = document.getElementById('size-section');
                 if (sizeSection) sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });

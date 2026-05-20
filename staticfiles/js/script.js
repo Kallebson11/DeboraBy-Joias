@@ -50,12 +50,50 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.detail-size-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             const val = this.dataset.size;
-            const label = document.getElementById('size-selected');
+            const label  = document.getElementById('size-selected');
             const hidden = document.getElementById('tamanho-selecionado');
+            const err    = document.getElementById('size-error');
             if (label)  label.textContent = val;
             if (hidden) hidden.value = val;
+            if (err)    err.style.display = 'none'; // esconde erro ao selecionar
         });
     });
+
+    // ============================================================
+    // VALIDAÇÃO DE TAMANHO — FORM DE ADICIONAR AO CARRINHO
+    // ============================================================
+    const addCartForm = document.querySelector('form[data-require-size]');
+    if (addCartForm) {
+        addCartForm.addEventListener('submit', function (e) {
+            const requireSize  = this.dataset.requireSize === 'true';
+            const tamanhoInput = document.getElementById('tamanho-selecionado');
+
+            if (requireSize && tamanhoInput && !tamanhoInput.value.trim()) {
+                e.preventDefault();
+
+                // Mensagem em vermelho abaixo de Tamanho
+                const errMsg = document.getElementById('size-error-msg');
+                if (errMsg) errMsg.style.display = 'block';
+
+                // Borda vermelha nos botões de tamanho
+                document.querySelectorAll('.detail-size-btn').forEach(b => {
+                    b.style.borderColor = '#e74c3c';
+                });
+
+                // Remove após 3 segundos
+                setTimeout(() => {
+                    if (errMsg) errMsg.style.display = 'none';
+                    document.querySelectorAll('.detail-size-btn').forEach(b => {
+                        b.style.borderColor = '';
+                    });
+                }, 3000);
+
+                // Rola até a seção de tamanhos
+                const sizeSection = document.getElementById('size-section');
+                if (sizeSection) sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
 
     // ============================================================
     // VALIDAÇÃO DE SENHA — REGISTRO
