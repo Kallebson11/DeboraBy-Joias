@@ -38,11 +38,9 @@
                         <div class="cart-item-bottom">
                             <span class="cart-item-qty">{{ item.quantity }} un.</span>
 
-                            <form method="POST" action="{% url 'carts:update' %}" class="d-inline">
+                            <form method="POST" action="{% url 'carts:remove' %}" class="d-inline">
                                 {% csrf_token %}
-                                <input type="hidden" name="product_id" value="{{ item.product.id }}" />
-                                <input type="hidden" name="action" value="delete" />
-                                <input type="hidden" name="tamanho" value="{{ item.tamanho }}" />
+                                <input type="hidden" name="cartitem_id" value="{{ item.id }}" />
                                 <button type="submit" class="cart-item-remove">
                                     <i class="fa-solid fa-trash"></i> Remover
                                 </button>

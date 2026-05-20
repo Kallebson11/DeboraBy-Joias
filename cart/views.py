@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
 from produtos.models import Produto
-from .models import Cart
+from .models import Cart, CartItem
 from urllib.parse import quote
 
 
@@ -56,6 +56,21 @@ class CartUpdateView(View):
         if 'produto' in referer:
             return redirect('produto_detalhe', produto_id=product_id)
 
+        return redirect('carts:home')
+
+
+class CartRemoveItemView(LoginRequiredMixin, View):
+    """Remove um CartItem diretamente pelo seu ID — sem ambiguidade."""
+    login_url = '/users/login/'
+    redirect_field_name = 'next'
+
+    def post(self, request, *args, **kwargs):
+        cartitem_id = request.POST.get('cartitem_id')
+        try:
+            item = CartItem.objects.get(id=cartitem_id, cart__user=request.user)
+            item.delete()
+        except CartItem.DoesNotExist:
+            pass
         return redirect('carts:home')
 
 
