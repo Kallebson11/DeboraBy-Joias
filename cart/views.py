@@ -90,7 +90,7 @@ class CartWhatsAppView(LoginRequiredMixin, View):
 
     def get(self, request):
         cart_obj, _ = Cart.objects.new_or_get(request)
-        numero_whatsapp = getattr(settings, 'WHATSAPP_NUMBER', '5538999272628')
+        numero_whatsapp = getattr(settings, 'WHATSAPP_NUMBER')
         mensagem = self._gerar_mensagem_pedido(cart_obj)
         whatsapp_link = f"https://wa.me/{numero_whatsapp}?text={quote(mensagem)}"
         return redirect(whatsapp_link)
