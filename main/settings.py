@@ -23,7 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 WHATSAPP_NUMBER = config('WHATSAPP_NUMBER')
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -38,6 +37,19 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
+# Credenciais do Supabase (compatível com S3)
+AWS_ACCESS_KEY_ID     = config('SUPABASE_KEY')
+AWS_SECRET_ACCESS_KEY = config('SUPABASE_KEY')
+AWS_STORAGE_BUCKET_NAME = config('SUPABASE_BUCKET')
+AWS_S3_ENDPOINT_URL   = config('SUPABASE_URL') + '/storage/v1/s3'
+AWS_S3_REGION_NAME    = 'us-east-1'  # valor fixo exigido pelo Supabase
+AWS_DEFAULT_ACL       = 'public-read'
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH  = False        # URLs públicas sem token
+
+DEFAULT_FILE_STORAGE  = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +62,7 @@ INSTALLED_APPS = [
     'produtos',
     'users',
     'cart',
+    'storages'
 ]
 
 MIDDLEWARE = [
