@@ -47,6 +47,7 @@ AWS_DEFAULT_ACL       = 'public-read'
 AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH  = False        # URLs públicas sem token
 
+
 DEFAULT_FILE_STORAGE  = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/'
 
