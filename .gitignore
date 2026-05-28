@@ -1,3 +1,4 @@
 *.env
 Libs/
-staticfiles/
+staticfiles/.env
+dados.json
