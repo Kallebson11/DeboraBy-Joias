@@ -48,11 +48,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH  = False        # URLs públicas sem token
 
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-    },
-}
+
 MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/'
 
 # Application definition
@@ -122,12 +118,14 @@ DATABASES = {
     )
 }
 
-#STORAGES = {
-#   "staticfiles": {
-#       "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#
-#}
-
+STORAGES = {
+   "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        },
+   }
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
