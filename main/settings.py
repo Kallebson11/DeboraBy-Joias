@@ -16,7 +16,7 @@ from decouple import config
 import dj_database_url
 
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', cast=bool)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -119,13 +119,14 @@ DATABASES = {
 }
 
 STORAGES = {
-   "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        },
-   }
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
 }
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -161,16 +162,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Arquivos estáticos (CSS, imagens)
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Pasta dos arquivos CSS/JS
-]
 
 # Configurações de mídia (imagens dos produtos)
 #MEDIA_URL = '/media/'
 #MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -188,8 +184,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Arquivos estáticos (CSS, imagens)
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Pasta dos arquivos CSS/JS
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
