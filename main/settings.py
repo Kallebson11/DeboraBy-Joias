@@ -167,7 +167,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Arquivos estáticos (CSS, imagens)
-STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Pasta dos arquivos CSS/JS
 ]
@@ -175,7 +175,6 @@ STATICFILES_DIRS = [
 # Configurações de mídia (imagens dos produtos)
 #MEDIA_URL = '/media/'
 #MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
