@@ -50,7 +50,10 @@ AWS_QUERYSTRING_AUTH  = False        # URLs públicas sem token
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/'
@@ -127,7 +130,6 @@ DATABASES = {
 #       "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
 #
 #}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
