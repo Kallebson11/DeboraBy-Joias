@@ -41,13 +41,13 @@ SESSION_COOKIE_SECURE = True
 AWS_ACCESS_KEY_ID     = config('SUPABASE_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('SUPABASE_BUCKET')
-AWS_S3_ENDPOINT_URL   = config('SUPABASE_URL') + '/storage/v1/s3'
+AWS_S3_ENDPOINT_URL   = config('SUPABASE_URL') + '/storage/v1'
 AWS_S3_REGION_NAME    = 'us-east-2'  # valor fixo exigido pelo Supabase
 AWS_DEFAULT_ACL       = 'public-read'
 AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH  = False        # URLs públicas sem token
 
-MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/produtos'
+MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/'
 
 # Application definition
 
