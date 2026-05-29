@@ -50,10 +50,7 @@ AWS_QUERYSTRING_AUTH  = False        # URLs públicas sem token
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "storages.backends.s3.S3Storage",
     },
 }
 MEDIA_URL = config('SUPABASE_URL') + '/storage/v1/object/public/' + config('SUPABASE_BUCKET') + '/'
@@ -175,6 +172,7 @@ STATICFILES_DIRS = [
 # Configurações de mídia (imagens dos produtos)
 #MEDIA_URL = '/media/'
 #MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
