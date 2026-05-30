@@ -95,7 +95,13 @@ img { display: block; max-width: 100%; }
     transition: border-color var(--t);
 }
 .search-input::placeholder { color: rgba(255,255,255,0.35); }
-.search-input:focus { outline: none; border-color: var(--teal); background: rgba(255,255,255,0.1); }
+.search-input:focus {
+    outline: none;
+    border-color: var(--teal);
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    box-shadow: none; /* remove o glow azul do Bootstrap que sobrescreve o color */
+}
 
 .btn-search {
     background: var(--teal);
